@@ -92,6 +92,24 @@ public class MyView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         drawBoard(canvas);
+        
+        drawPieces(canvas);
+    }
+
+    private void drawPieces(Canvas canvas) {
+        for(int i=0,n=mWhiteArray.size();i<n;i++){
+            Point whitePoint=mWhiteArray.get(i);
+            float x=(whitePoint.x+(1-ratioPieceOfLineHeight)/2)*mLineHeight;
+            float y=(whitePoint.y+(1-ratioPieceOfLineHeight)/2)*mLineHeight;
+            canvas.drawBitmap(mWhitePiece,x,y,null);
+        }
+        for(int i=0,n=mBlackArray.size();i<n;i++){
+            Point blackPoint=mBlackArray.get(i);
+            float x=(blackPoint.x+(1-ratioPieceOfLineHeight)/2)*mLineHeight;
+            float y=(blackPoint.y+(1-ratioPieceOfLineHeight)/2)*mLineHeight;
+            canvas.drawBitmap(mBlackPiece,x,y,null);
+        }
+
     }
 
     private void drawBoard(Canvas canvas) {
