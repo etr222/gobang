@@ -1,6 +1,9 @@
 package com.example.gobang;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
@@ -41,10 +44,15 @@ public class MyView extends View {
     private boolean mIsGameOver;
     private boolean mIsWhiteWinner;
 
+    
+    private Point whitePoint;
+    private Point blackPoint;
+    private boolean mIsBackPoint=false;
+
 
     public MyView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
-        setBackgroundColor(0x44FF0000);
+//        setBackgroundColor(0x44FF0000);
         init();
     }
 
@@ -118,8 +126,23 @@ public class MyView extends View {
 
             String text = mIsWhiteWinner ? "白棋胜利" : "黑棋胜利";
 
-            Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
-
+//            Toast.makeText(getContext(), text, Toast.LENGTH_SHORT).show();
+            AlertDialog.Builder dialog=new AlertDialog.Builder(getContext());
+            dialog.setTitle("恭喜"+text);
+            dialog.setMessage("是否再来一局");
+            dialog.setPositiveButton("不", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+            dialog.setNegativeButton("再来一局", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    reStart();
+                }
+            });
+            dialog.show();
         }
     }
 
@@ -239,13 +262,14 @@ public class MyView extends View {
 
     private void drawPieces(Canvas canvas) {
         for (int i = 0, n = mWhiteArray.size(); i < n; i++) {
-            Point whitePoint = mWhiteArray.get(i);
+            whitePoint = mWhiteArray.get(i);
             float x = (whitePoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             float y = (whitePoint.y + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             canvas.drawBitmap(mWhitePiece, x, y, null);
+
         }
         for (int i = 0, n = mBlackArray.size(); i < n; i++) {
-            Point blackPoint = mBlackArray.get(i);
+            blackPoint = mBlackArray.get(i);
             float x = (blackPoint.x + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             float y = (blackPoint.y + (1 - ratioPieceOfLineHeight) / 2) * mLineHeight;
             canvas.drawBitmap(mBlackPiece, x, y, null);
@@ -290,8 +314,11 @@ public class MyView extends View {
             } else {
                 mBlackArray.add(p);
             }
+
             invalidate();
+
             mIsWhite = !mIsWhite;
+
         }
 
 
@@ -308,6 +335,21 @@ public class MyView extends View {
         mBlackArray.clear();
         mIsGameOver=false;
         mIsWhiteWinner=false;
+        mIsWhite=false;
+        invalidate();
+    }
+    public void backStep(){
+        if (mIsWhite&&mBlackArray.size()>0){
+            mBlackArray.remove(blackPoint);
+            mIsWhite=!mIsWhite;//单机模式悔棋。
+            mIsBackPoint=!mIsBackPoint;
+        }else {
+            if (mWhiteArray.size()>0){
+                mWhiteArray.remove(whitePoint);
+                mIsWhite=!mIsWhite;//单机模式悔棋。
+                mIsBackPoint=!mIsBackPoint;
+            }
+        }
         invalidate();
     }
 
